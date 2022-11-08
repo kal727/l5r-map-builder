@@ -44,126 +44,15 @@ for (var x = relevantTileXStart; x <= relevantTileXEnd; x++)
     }
 }
 
-//Generate Image Strips
-for (var x = relevantTileXStart; x <= relevantTileXEnd; x++)
-{
-    var imageStripFilename = $"image-strip-{x}.jpeg";
-    var imageStripFilePath = $"{baseFilePath}image-strips/{imageStripFilename}";
-
-    if (!File.Exists(imageStripFilePath))
-    {
-        var imageFilePathsInStrip = new List<string>();
-        for (var y = relevantTileYStart; y <= relevantTileYEnd; y++)
-        {
-            var imageTilePath = $"{baseFilePath}image-tiles/{x}-{y}.png";
-            imageFilePathsInStrip.Add(imageTilePath);
-        }
-        var imageStrip = CombineBitmap(imageFilePathsInStrip, true);
-        imageStrip.Save(imageStripFilePath, System.Drawing.Imaging.ImageFormat.Jpeg);
-    }
-}
-
-//Generated finished image with strip
-var completedImageFilePath = $"{baseFilePath}full-image-striped.jpeg";
-if (!File.Exists(completedImageFilePath))
-{
-    var imageStripFilePaths = new List<string>();
-    for (var x = relevantTileXStart; x <= relevantTileXEnd; x++)
-    {
-        imageStripFilePaths.Add($"{baseFilePath}image-strips/image-strip-{x}.jpeg");
-    }
-    var completedImage = CombineBitmap(imageStripFilePaths, false);
-    completedImage.Save(completedImageFilePath, System.Drawing.Imaging.ImageFormat.Jpeg);
-}
-
-
 //Generate Completed Images
 var completedImagePath = $"{baseFilePath}full-image.jpeg";
 if (!File.Exists(completedImagePath))
 {
-    var completedImage = GenerateCombinedImage();
+    var completedImage = GenerateFinalImage();
     completedImage.Save(completedImagePath, System.Drawing.Imaging.ImageFormat.Jpeg);
 }
 
-Bitmap CombineBitmap(List<string> files, bool offsetByHeight)
-{
-    //read all images into memory
-    var images = new List<Bitmap>();
-    Bitmap finalImage = null;
-
-    try
-    {
-        int width = 0;
-        int height = 0;
-
-        foreach (string image in files)
-        {
-            //create a Bitmap from the file and add it to the list
-            Bitmap bitmap = new Bitmap(image);
-
-            //update the size of the final bitmap
-            if (offsetByHeight)
-            {
-                width = bitmap.Width;
-                height += bitmap.Height;
-            }
-            else
-            {
-                width += bitmap.Width;
-                height = bitmap.Height;
-            }
-
-            images.Add(bitmap);
-        }
-
-        //create a bitmap to hold the combined image
-        finalImage = new Bitmap(width, height);
-
-        //get a graphics object from the image so we can draw on it
-        using (Graphics g = Graphics.FromImage(finalImage))
-        {
-            //set background color
-            g.Clear(Color.Black);
-
-            //go through each image and draw it on the final image
-            int offset = 0;
-            foreach (Bitmap image in images)
-            {
-                if (offsetByHeight)
-                {
-                    g.DrawImage(image,
-                      new Rectangle(0, offset, image.Width, image.Height));
-                    offset += image.Height;
-                }
-                else
-                {
-                    g.DrawImage(image, new Rectangle(offset, 0, image.Width, image.Height));
-                    offset += image.Width;
-                }
-
-            }
-        }
-
-        return finalImage;
-    }
-    catch (Exception ex)
-    {
-        if (finalImage != null)
-            finalImage.Dispose();
-
-        throw ex;
-    }
-    finally
-    {
-        //clean up memory
-        foreach (Bitmap image in images)
-        {
-            image.Dispose();
-        }
-    }
-}
-
-Bitmap GenerateCombinedImage()
+Bitmap GenerateFinalImage()
 {
     //Create a bitmap to hold the combined image
     var finalWidth = imageWidth * (relevantTileXEnd - relevantTileXStart + 1);
@@ -214,3 +103,114 @@ Bitmap GenerateCombinedImage()
         }
     }
 }
+
+
+// //Generate Image Strips
+// for (var x = relevantTileXStart; x <= relevantTileXEnd; x++)
+// {
+//     var imageStripFilename = $"image-strip-{x}.jpeg";
+//     var imageStripFilePath = $"{baseFilePath}image-strips/{imageStripFilename}";
+
+//     if (!File.Exists(imageStripFilePath))
+//     {
+//         var imageFilePathsInStrip = new List<string>();
+//         for (var y = relevantTileYStart; y <= relevantTileYEnd; y++)
+//         {
+//             var imageTilePath = $"{baseFilePath}image-tiles/{x}-{y}.png";
+//             imageFilePathsInStrip.Add(imageTilePath);
+//         }
+//         var imageStrip = CombineBitmap(imageFilePathsInStrip, true);
+//         imageStrip.Save(imageStripFilePath, System.Drawing.Imaging.ImageFormat.Jpeg);
+//     }
+// }
+
+// //Generated finished image with strip
+// var completedImageFilePath = $"{baseFilePath}full-image-striped.jpeg";
+// if (!File.Exists(completedImageFilePath))
+// {
+//     var imageStripFilePaths = new List<string>();
+//     for (var x = relevantTileXStart; x <= relevantTileXEnd; x++)
+//     {
+//         imageStripFilePaths.Add($"{baseFilePath}image-strips/image-strip-{x}.jpeg");
+//     }
+//     var completedImage = CombineBitmap(imageStripFilePaths, false);
+//     completedImage.Save(completedImageFilePath, System.Drawing.Imaging.ImageFormat.Jpeg);
+// }
+
+// Bitmap CombineBitmap(List<string> files, bool offsetByHeight)
+// {
+//     //read all images into memory
+//     var images = new List<Bitmap>();
+//     Bitmap finalImage = null;
+
+//     try
+//     {
+//         int width = 0;
+//         int height = 0;
+
+//         foreach (string image in files)
+//         {
+//             //create a Bitmap from the file and add it to the list
+//             Bitmap bitmap = new Bitmap(image);
+
+//             //update the size of the final bitmap
+//             if (offsetByHeight)
+//             {
+//                 width = bitmap.Width;
+//                 height += bitmap.Height;
+//             }
+//             else
+//             {
+//                 width += bitmap.Width;
+//                 height = bitmap.Height;
+//             }
+
+//             images.Add(bitmap);
+//         }
+
+//         //create a bitmap to hold the combined image
+//         finalImage = new Bitmap(width, height);
+
+//         //get a graphics object from the image so we can draw on it
+//         using (Graphics g = Graphics.FromImage(finalImage))
+//         {
+//             //set background color
+//             g.Clear(Color.Black);
+
+//             //go through each image and draw it on the final image
+//             int offset = 0;
+//             foreach (Bitmap image in images)
+//             {
+//                 if (offsetByHeight)
+//                 {
+//                     g.DrawImage(image,
+//                       new Rectangle(0, offset, image.Width, image.Height));
+//                     offset += image.Height;
+//                 }
+//                 else
+//                 {
+//                     g.DrawImage(image, new Rectangle(offset, 0, image.Width, image.Height));
+//                     offset += image.Width;
+//                 }
+
+//             }
+//         }
+
+//         return finalImage;
+//     }
+//     catch (Exception ex)
+//     {
+//         if (finalImage != null)
+//             finalImage.Dispose();
+
+//         throw ex;
+//     }
+//     finally
+//     {
+//         //clean up memory
+//         foreach (Bitmap image in images)
+//         {
+//             image.Dispose();
+//         }
+//     }
+// }
