@@ -4,7 +4,6 @@ using System.Drawing;
 var baseFilePath = "../../../images/";
 var baseUriPath = "http://talesofrokugan.com/map/6/";
 
-var gridLength = 64;
 var imageHeight = 256;
 var imageWidth = 256;
 
